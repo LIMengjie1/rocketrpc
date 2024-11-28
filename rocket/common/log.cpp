@@ -10,13 +10,14 @@
 namespace rocket{
 
 static Logger* g_logger = nullptr;
+
 Logger* Logger::GetGlobalLogger() {
-    if (g_logger) {
-        return g_logger;
-    }
+  return g_logger;   
+}
+
+void Logger::InitGlobalLogger() {
     LogLevel loglevel = StringToLogLevel(Config::GetGlobalConfig()->m_log_level);
     g_logger = new Logger(loglevel);
-    return g_logger;
 }
 
 string logLevelToString(LogLevel l) {
@@ -56,13 +57,14 @@ string LogEvent::toString() {
     std::stringstream ss;
     ss << "[" << logLevelToString(m_level) << "]\t" <<  "[" << time_str << "]\t"
        << "[" <<m_pid << ":" << m_thread_id << "]\t" 
-        <<"[" << time_str << "]\t" << "[" << string(__FILE__) << ":"<< __LINE__ << "]\t";
+        <<"[" << time_str << "]\t";
 
     return ss.str();
 }
 
 void Logger::pushLog(const string& msg) {
    cout << "pushed log\n";
+   std::lock_guard<std::mutex> guard(m_mutex);
     m_buffer.emplace(msg);
     cout << "mbuffer size:" << m_buffer.size() << endl;
     //if (event.getLogLevel() < m_set_level) {
@@ -71,7 +73,9 @@ void Logger::pushLog(const string& msg) {
 }
 
 void Logger::log() {
+  std::lock_guard<std::mutex> guard(m_mutex);
     cout << "m buffer size:" << m_buffer.size() << endl;
+    
     while (!m_buffer.empty())  {
         string msg = m_buffer.front();
         m_buffer.pop();

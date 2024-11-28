@@ -5,6 +5,7 @@ using namespace std;
 
 int main() {
     rocket::Config::SetGlobalConfig("../conf/rocket.xml");
+    rocket::Logger::InitGlobalLogger();
     DEBUGLOG("test debug log %s", "fuck");
     DEBUGLOG("test info log %s", "fuck");
 //     std::cout << "ads\n";
