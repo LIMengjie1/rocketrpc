@@ -1,5 +1,7 @@
 #include "rocket/common/god.h"
 #include "rocket/net/fd_event.h"
+#include "rocket/net/timer.h"
+#include "timer_event.h"
 #include "wakeup_fd_event.h"
 #include <functional>
 
@@ -16,10 +18,13 @@ public:
     void wakeup();
     bool isInLoopThread();
     void addTask(std::function<void()>, bool is_wake_up = false);
+    void addTimerEvent(TimerEvent::s_ptr);
 private:
     void dealWakeUp();
 
     void initWakeUpFdEvent();
+
+    void initTimer();
 
     WakeUpFdEvent* m_wakeup_fd_event = nullptr;
 
@@ -38,6 +43,8 @@ private:
     queue<function<void()>> m_pending_tasks;
 
     mutex m_mut;
+
+    Timer* m_timer = nullptr;
 };
 
 }

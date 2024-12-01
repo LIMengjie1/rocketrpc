@@ -41,7 +41,7 @@ namespace rocket {
 
 static thread_local EventLoop* t_current_eventloop = nullptr;
 static int g_epoll_max_timeout = 100000;
-static int g_epoll_max_events = 10;
+static int constexpr g_epoll_max_events = 10;
 
 EventLoop::EventLoop() {
     if (t_current_eventloop) {
@@ -56,8 +56,18 @@ EventLoop::EventLoop() {
         exit(0);
     }
     initWakeUpFdEvent();
-    INFOLOG("create event loop in thread %d", m_pid);
+    initTimer();
+    INFOLOG("create event loop in thread %d", m_thread_id);
     t_current_eventloop = this;
+}
+
+void EventLoop::addTimerEvent(TimerEvent::s_ptr event) {
+    m_timer->addTimerEvent(event);
+}
+
+void EventLoop::initTimer() {
+    m_timer = new Timer();
+    addEpollEvent(m_timer);
 }
 
 void EventLoop::initWakeUpFdEvent() {
@@ -83,7 +93,7 @@ void EventLoop::initWakeUpFdEvent() {
 EventLoop::~EventLoop() {
     close(m_epoll_fd);
     delete m_wakeup_fd_event;
-
+    delete m_timer;
 }
 
 void EventLoop::loop() {
@@ -97,6 +107,7 @@ void EventLoop::loop() {
             auto cb = tmp.front();
             tmp.pop();
             if (cb) {cb();}
+            DEBUGLOG("exec cb");
         }
         int timeout = g_epoll_max_timeout;
         epoll_event result_events[g_epoll_max_events];
@@ -174,6 +185,7 @@ void EventLoop::addTask(std::function<void()> cb, bool is_wake_up) {
     ERRORLOG("add a task1");
     m_pending_tasks.push(cb);
     if (is_wake_up) {
+        DEBUGLOG("wakeup");
         wakeup();
     }
     ERRORLOG("add a task end");

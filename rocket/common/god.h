@@ -11,11 +11,16 @@
 #include <mutex>
 #include <functional>
 #include <sys/socket.h>
+#include <sys/time.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <string.h>
+#include <memory>
 
+using std::shared_ptr;
+using std::unique_ptr;
+using std::make_shared;
 using  std::function;
 using std::thread;
 using std::mutex;

@@ -13,6 +13,7 @@ public:
     };
 
     FdEvent(int fd);
+    FdEvent() = default;
 
     ~FdEvent();
 
