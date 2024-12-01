@@ -1,5 +1,6 @@
 #include <tinyxml/tinyxml.h>
 #include "rocket/common/config.h"
+#include "rocket/common/god.h"
 
 
 #define READ_XML_NODE(name, parent) \
@@ -9,13 +10,7 @@ if (!name##_node) { \
     exit(0); \
 } \
 
-// #define READ_STR_FROM_XML_NODE(name, parent) \
-// TiXmlElement* name##_node = parent->FirstChildElement("log_level"); \
-// if (!name##_node || !name##_node->GetText()) { \
-//     printf("get %s failed\n", #name); \
-//     exit(0); \
-// } \
-// string name##_str = string(name##_node->GetText()); 
+
 
 #define READ_STR_FROM_XML_NODE(name, parent) \
   TiXmlElement* name##_node = parent->FirstChildElement(#name); \
@@ -32,16 +27,17 @@ Config* Config::GetGlobalConfig() {
     return g_config;
 }
 
-void SetGlobalConfig(const string& xmlfile) {
+void Config::SetGlobalConfig(const string& xmlfile) {
     if (g_config == nullptr) {
         g_config = new Config(xmlfile);
     }
 }
 Config::Config(const string& xmlfile) {
     TiXmlDocument* xml_document = new TiXmlDocument();
+    cout << "xmlfile:" << xmlfile << endl;
     bool rt = xml_document->LoadFile(xmlfile.c_str());
     if (!rt) {
-        printf("start failed\n");
+        printf("start failed, error:%s\n", xml_document->ErrorDesc());
         exit(0);
     }
     READ_XML_NODE(root, xml_document);

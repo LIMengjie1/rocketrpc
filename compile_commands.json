@@ -1,0 +1,80 @@
+[
+    {
+        "arguments": [
+            "g++",
+            "-c",
+            "-g",
+            "-O0",
+            "-std=c++11",
+            "-Wall",
+            "-Wno-deprecated",
+            "-Wno-unused-but-set-variable",
+            "-I./",
+            "-Irocket",
+            "-Irocket/common",
+            "-Irocket/net",
+            "-Irocket/net/tcp",
+            "-Irocket/net/coder",
+            "-Irocket/net/rpc",
+            "-o",
+            "obj/config.o",
+            "rocket/common/config.cpp"
+        ],
+        "directory": "/home/li/rocketrpc",
+        "file": "rocket/common/config.cpp"
+    },
+    {
+        "arguments": [
+            "g++",
+            "-c",
+            "-g",
+            "-O0",
+            "-std=c++11",
+            "-Wall",
+            "-Wno-deprecated",
+            "-Wno-unused-but-set-variable",
+            "-I./",
+            "-Irocket",
+            "-Irocket/common",
+            "-Irocket/net",
+            "-Irocket/net/tcp",
+            "-Irocket/net/coder",
+            "-Irocket/net/rpc",
+            "-pthread",
+            "./obj/config.o",
+            "./obj/log.o",
+            "./obj/util.o",
+            "/usr/local/lib/libprotobuf.a",
+            "/usr/local/lib/libtinyxml.a",
+            "-o",
+            "bin/test_log",
+            "testcases/test_log.cpp"
+        ],
+        "directory": "/home/li/rocketrpc",
+        "file": "testcases/test_log.cpp"
+    },
+    {
+        "arguments": [
+            "g++",
+            "-c",
+            "-g",
+            "-O0",
+            "-std=c++11",
+            "-Wall",
+            "-Wno-deprecated",
+            "-Wno-unused-but-set-variable",
+            "-I./",
+            "-Irocket",
+            "-Irocket/common",
+            "-Irocket/net",
+            "-Irocket/net/tcp",
+            "-Irocket/net/coder",
+            "-Irocket/net/rpc",
+            "-o",
+            "obj/log.o",
+            "rocket/common/log.cpp"
+        ],
+        "directory": "/home/li/rocketrpc",
+        "file": "rocket/common/log.cpp"
+    }
+]

@@ -1,4 +1,7 @@
 .*a
 ./obj
 *.o
+bin/*
+.cache/
+.vscode/
 

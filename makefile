@@ -59,11 +59,12 @@ RPC_OBJ := $(patsubst $(PATH_RPC)/%.cpp, $(PATH_OBJ)/%.o, $(wildcard $(PATH_RPC)
 #$(PATH_BIN)/test_log: $(LIB_OUT)
 #	$(CXX) $(CXXFLAGS) $(PATH_TESTCASES)/test_log.cc -o $@ $(LIB_OUT) $(LIBS) -ldl -pthread
 #
-$(PATH_BIN)/test_log: $(COMM_OBJ)
-	$(CXX) $(CXXFLAGS) $(PATH_TESTCASES)/test_log.cpp -o $@ $(LIBS) -ldl -pthread ./obj/*.o
-#$(PATH_BIN)/test_eventloop: $(LIB_OUT)
-#	$(CXX) $(CXXFLAGS) $(PATH_TESTCASES)/test_eventloop.cc -o $@ $(LIB_OUT) $(LIBS) -ldl -pthread
-#
+#$(PATH_BIN)/test_log: $(COMM_OBJ)
+#	$(CXX) $(CXXFLAGS) $(PATH_TESTCASES)/test_log.cpp -o $@  -ldl -pthread ./obj/*.o $(LIBS)
+$(PATH_BIN)/test_eventloop: $(COMM_OBJ) $(NET_OBJ)
+	#$(CXX) $(CXXFLAGS) $(PATH_TESTCASES)/test_eventloop.cpp -o $@ $(LIB_OUT) $(LIBS) -ldl -pthread
+	$(CXX) $(CXXFLAGS) $(PATH_TESTCASES)/test_eventloop.cpp -o $@  -ldl -pthread ./obj/*.o $(LIBS)
+
 #$(PATH_BIN)/test_tcp: $(LIB_OUT)
 #	$(CXX) $(CXXFLAGS) $(PATH_TESTCASES)/test_tcp.cc -o $@ $(LIB_OUT) $(LIBS) -ldl -pthread
 #
@@ -84,9 +85,9 @@ $(PATH_OBJ)/%.o : $(PATH_COMM)/%.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 
-#$(PATH_OBJ)/%.o : $(PATH_NET)/%.cc
-#	$(CXX) $(CXXFLAGS) -c $< -o $@
-#
+$(PATH_OBJ)/%.o : $(PATH_NET)/%.cpp
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+
 #$(PATH_OBJ)/%.o : $(PATH_TCP)/%.cc
 #	$(CXX) $(CXXFLAGS) -c $< -o $@
 #
@@ -103,7 +104,7 @@ PRINT-% : ; @echo $* = $($*)
 
 # to clean 
 clean :
-	rm -f $(COMM_OBJ) $(NET_OBJ) $(TESTCASES) $(TEST_CASE_OUT) $(PATH_LIB)/librocket.a $(PATH_OBJ)/librocket.a $(PATH_OBJ)/*.o
+	rm -f $(COMM_OBJ) $(NET_OBJ) $(TESTCASES) $(TEST_CASE_OUT) $(PATH_LIB)/librocket.a $(PATH_OBJ)/librocket.a $(PATH_OBJ)/*.o $(PATH_BIN)/*
 
 # install
 install:

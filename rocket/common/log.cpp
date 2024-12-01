@@ -1,8 +1,8 @@
 #include <sys/time.h>
 #include <sstream>
 #include <stdio.h>
-#include "rocket/common/log.h"
 #include "rocket/common/util.h"
+#include "rocket/common/log.h"
 #include "rocket/common/config.h"
 
 
@@ -63,22 +63,22 @@ string LogEvent::toString() {
 }
 
 void Logger::pushLog(const string& msg) {
-   cout << "pushed log\n";
    std::lock_guard<std::mutex> guard(m_mutex);
     m_buffer.emplace(msg);
-    cout << "mbuffer size:" << m_buffer.size() << endl;
     //if (event.getLogLevel() < m_set_level) {
     //    return;
     //}
 }
 
 void Logger::log() {
-  std::lock_guard<std::mutex> guard(m_mutex);
-    cout << "m buffer size:" << m_buffer.size() << endl;
-    
-    while (!m_buffer.empty())  {
-        string msg = m_buffer.front();
-        m_buffer.pop();
+  decltype(m_buffer) tmp;
+  {
+    std::lock_guard<std::mutex> guard(m_mutex);
+    tmp.swap(m_buffer);
+  }
+    while (!tmp.empty())  {
+        string msg = tmp.front();
+        tmp.pop();
         printf(msg.c_str());
     }
 }
