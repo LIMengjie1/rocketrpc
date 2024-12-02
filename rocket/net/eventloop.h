@@ -1,3 +1,4 @@
+#pragma once
 #include "rocket/common/god.h"
 #include "rocket/net/fd_event.h"
 #include "rocket/net/timer.h"
