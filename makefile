@@ -61,7 +61,7 @@ RPC_OBJ := $(patsubst $(PATH_RPC)/%.cpp, $(PATH_OBJ)/%.o, $(wildcard $(PATH_RPC)
 #
 #$(PATH_BIN)/test_log: $(COMM_OBJ)
 #	$(CXX) $(CXXFLAGS) $(PATH_TESTCASES)/test_log.cpp -o $@  -ldl -pthread ./obj/*.o $(LIBS)
-$(PATH_BIN)/test_eventloop: $(COMM_OBJ) $(NET_OBJ)
+$(PATH_BIN)/test_eventloop: $(COMM_OBJ) $(NET_OBJ) $(TCP_OBJ)
 	#$(CXX) $(CXXFLAGS) $(PATH_TESTCASES)/test_eventloop.cpp -o $@ $(LIB_OUT) $(LIBS) -ldl -pthread
 	$(CXX) $(CXXFLAGS) $(PATH_TESTCASES)/test_eventloop.cpp -o $@  -ldl -pthread ./obj/*.o $(LIBS)
 
@@ -88,9 +88,9 @@ $(PATH_OBJ)/%.o : $(PATH_COMM)/%.cpp
 $(PATH_OBJ)/%.o : $(PATH_NET)/%.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-#$(PATH_OBJ)/%.o : $(PATH_TCP)/%.cc
-#	$(CXX) $(CXXFLAGS) -c $< -o $@
-#
+$(PATH_OBJ)/%.o : $(PATH_TCP)/%.cpp
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+
 #$(PATH_OBJ)/%.o : $(PATH_CODER)/%.cc
 #	$(CXX) $(CXXFLAGS) -c $< -o $@
 #
