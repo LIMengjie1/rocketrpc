@@ -182,17 +182,23 @@ void EventLoop::delEpollEvent(FdEvent* event) {
 
 void EventLoop::addTask(std::function<void()> cb, bool is_wake_up) {
     std::lock_guard<mutex> lk{m_mut};
-    ERRORLOG("add a task1");
     m_pending_tasks.push(cb);
     if (is_wake_up) {
         DEBUGLOG("wakeup");
         wakeup();
     }
-    ERRORLOG("add a task end");
+    DEBUGLOG("add a task end");
 }
 
 bool EventLoop::isInLoopThread() {
     return getThreadId() == m_thread_id;
+}
+EventLoop* EventLoop::GetCurrentEventLoop() {
+    if (t_current_eventloop) {
+        return t_current_eventloop;
+    }
+    t_current_eventloop = new EventLoop();
+    return t_current_eventloop;
 }
 
 }

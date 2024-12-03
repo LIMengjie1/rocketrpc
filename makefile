@@ -50,6 +50,7 @@ RPC_OBJ := $(patsubst $(PATH_RPC)/%.cpp, $(PATH_OBJ)/%.o, $(wildcard $(PATH_RPC)
 
 #ALL_TESTS : $(PATH_BIN)/test_log $(PATH_BIN)/test_eventloop $(PATH_BIN)/test_tcp $(PATH_BIN)/test_client $(PATH_BIN)/test_rpc_client $(PATH_BIN)/test_rpc_server
 # ALL_TESTS : $(PATH_BIN)/test_log
+ALL_TESTS : $(PATH_BIN)/test_tcp
 
 #TEST_CASE_OUT := $(PATH_BIN)/test_log $(PATH_BIN)/test_eventloop $(PATH_BIN)/test_tcp $(PATH_BIN)/test_client  $(PATH_BIN)/test_rpc_client $(PATH_BIN)/test_rpc_server
 #TEST_CASE_OUT := $(PATH_BIN)/test_log $(PATH_BIN)/test_eventloop $(PATH_BIN)/test_tcp $(PATH_BIN)/test_client
@@ -62,12 +63,13 @@ RPC_OBJ := $(patsubst $(PATH_RPC)/%.cpp, $(PATH_OBJ)/%.o, $(wildcard $(PATH_RPC)
 #$(PATH_BIN)/test_log: $(COMM_OBJ)
 #	$(CXX) $(CXXFLAGS) $(PATH_TESTCASES)/test_log.cpp -o $@  -ldl -pthread ./obj/*.o $(LIBS)
 $(PATH_BIN)/test_eventloop: $(COMM_OBJ) $(NET_OBJ) $(TCP_OBJ)
-	#$(CXX) $(CXXFLAGS) $(PATH_TESTCASES)/test_eventloop.cpp -o $@ $(LIB_OUT) $(LIBS) -ldl -pthread
+#	$(CXX) $(CXXFLAGS) $(PATH_TESTCASES)/test_eventloop.cpp -o $@ $(LIB_OUT) $(LIBS) -ldl -pthread
 	$(CXX) $(CXXFLAGS) $(PATH_TESTCASES)/test_eventloop.cpp -o $@  -ldl -pthread ./obj/*.o $(LIBS)
 
-#$(PATH_BIN)/test_tcp: $(LIB_OUT)
-#	$(CXX) $(CXXFLAGS) $(PATH_TESTCASES)/test_tcp.cc -o $@ $(LIB_OUT) $(LIBS) -ldl -pthread
-#
+$(PATH_BIN)/test_tcp: $(COMM_OBJ) $(NET_OBJ) $(TCP_OBJ)
+#   $(CXX) $(CXXFLAGS) $(PATH_TESTCASES)/test_tcp.cpp -o $@ $(LIB_OUT) $(LIBS) -ldl -pthread
+	$(CXX) $(CXXFLAGS) $(PATH_TESTCASES)/test_tcp.cpp -o $@  -ldl -pthread ./obj/*.o $(LIBS)
+
 #$(PATH_BIN)/test_client: $(LIB_OUT)
 #	$(CXX) $(CXXFLAGS) $(PATH_TESTCASES)/test_client.cc -o $@ $(LIB_OUT) $(LIBS) -ldl -pthread
 #

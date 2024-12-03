@@ -20,6 +20,7 @@ public:
     bool isInLoopThread();
     void addTask(std::function<void()>, bool is_wake_up = false);
     void addTimerEvent(TimerEvent::s_ptr);
+    static EventLoop* GetCurrentEventLoop();
 private:
     void dealWakeUp();
 

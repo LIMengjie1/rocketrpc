@@ -8,9 +8,12 @@
 namespace rocket {
 class TcpAcceptor {
 public:
+    using s_ptr = std::shared_ptr<TcpAcceptor>;
     TcpAcceptor(NetAddr::s_ptr local_addr);
 
     ~TcpAcceptor();
+
+    int getListenFd();
 
     int accept() {
         if (m_family == AF_INET) {
@@ -23,9 +26,10 @@ public:
                 ERRORLOG("accept new client failed, erno:%d, error:%s", errno, strerror(errno));
             }
             IPNetAddr peer_addr(client_addr);
-            INFOLOG("a client have accepted succ, peer addr [%s]", peer_addr.toString());
+            INFOLOG("a client have accepted succ, peer addr [%s]", peer_addr.toString().c_str());
             return rt;
         }
+        return -1;
     }
 
 private:

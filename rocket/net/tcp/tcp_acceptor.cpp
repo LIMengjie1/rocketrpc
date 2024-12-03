@@ -39,4 +39,8 @@ TcpAcceptor::TcpAcceptor(NetAddr::s_ptr local_addr) {
 TcpAcceptor::~TcpAcceptor() {
 
 }
+
+int TcpAcceptor::getListenFd() {
+    return m_listenfd;
+}
 }
