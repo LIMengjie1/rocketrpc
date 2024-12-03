@@ -3,6 +3,8 @@
 #include "god.h"
 #include <functional>
 #include <sys/epoll.h>
+#include <fcntl.h>
+#include <system_error>
 
 namespace rocket {
 class FdEvent {
@@ -27,6 +29,14 @@ public:
 
     epoll_event getEpollEvent() {
         return m_listen_events;
+    }
+
+    void setNonBlock() {
+       int flag = fcntl(m_fd, F_GETFL, 0); 
+       if(flag & O_NONBLOCK) {
+        return;
+       }
+       fcntl(m_fd, F_SETFL, flag | O_NONBLOCK);
     }
 
 protected:

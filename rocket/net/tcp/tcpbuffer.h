@@ -1,9 +1,12 @@
 #pragma once
 #include "god.h"
+#include <memory>
+#include <vector>
 
 namespace rocket {
 class TcpBuffer {
 public:
+    using s_ptr = std::shared_ptr<TcpBuffer>;
     TcpBuffer(int size);
 
     ~TcpBuffer();
@@ -31,7 +34,9 @@ public:
     void moveReadIndex(int);
 
     void moveWriteIndex(int);
-
+    vector<char>& getBuffer() {
+        return m_buffer;
+    }
 private:
     int m_read_index = 0;
     int m_write_index = 0;
