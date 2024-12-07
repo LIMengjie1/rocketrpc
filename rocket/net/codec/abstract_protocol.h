@@ -16,7 +16,6 @@ public:
 
     virtual ~AbstractProtocol(){};
 
-protected:
     std::string m_req_id;
 };
 }

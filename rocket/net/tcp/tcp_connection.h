@@ -1,12 +1,12 @@
 #pragma once
-#include "abstract_protocol.h"
+#include "codec/abstract_protocol.h"
 #include "eventloop.h"
 #include "fd_event.h"
 #include "god.h"
 #include "net_addr.h"
 #include "tcpbuffer.h"
 #include "io_thread.h"
-#include "abstract_codec.h"
+#include "codec/abstract_codec.h"
 #include <functional>
 #include <memory>
 #include <vector>

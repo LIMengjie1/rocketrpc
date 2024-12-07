@@ -12,7 +12,7 @@ PATH_ROCKET = rocket
 PATH_COMM = $(PATH_ROCKET)/common
 PATH_NET = $(PATH_ROCKET)/net
 PATH_TCP = $(PATH_ROCKET)/net/tcp
-PATH_CODER = $(PATH_ROCKET)/net/coder
+PATH_CODER = $(PATH_ROCKET)/net/codec
 PATH_RPC = $(PATH_ROCKET)/net/rpc
 
 PATH_TESTCASES = testcases
@@ -62,15 +62,15 @@ ALL_TESTS : $(PATH_BIN)/test_tcp  $(PATH_BIN)/test_client
 #
 #$(PATH_BIN)/test_log: $(COMM_OBJ)
 #	$(CXX) $(CXXFLAGS) $(PATH_TESTCASES)/test_log.cpp -o $@  -ldl -pthread ./obj/*.o $(LIBS)
-$(PATH_BIN)/test_eventloop: $(COMM_OBJ) $(NET_OBJ) $(TCP_OBJ)
+$(PATH_BIN)/test_eventloop: $(COMM_OBJ) $(NET_OBJ) $(TCP_OBJ) $(CODER_OBJ)
 #	$(CXX) $(CXXFLAGS) $(PATH_TESTCASES)/test_eventloop.cpp -o $@ $(LIB_OUT) $(LIBS) -ldl -pthread
 	$(CXX) $(CXXFLAGS) $(PATH_TESTCASES)/test_eventloop.cpp -o $@  -ldl -pthread ./obj/*.o $(LIBS)
 
-$(PATH_BIN)/test_tcp: $(COMM_OBJ) $(NET_OBJ) $(TCP_OBJ)
+$(PATH_BIN)/test_tcp: $(COMM_OBJ) $(NET_OBJ) $(TCP_OBJ) $(CODER_OBJ)
 #   $(CXX) $(CXXFLAGS) $(PATH_TESTCASES)/test_tcp.cpp -o $@ $(LIB_OUT) $(LIBS) -ldl -pthread
 	$(CXX) $(CXXFLAGS) $(PATH_TESTCASES)/test_tcp.cpp -o $@  -ldl -pthread ./obj/*.o $(LIBS)
 
-$(PATH_BIN)/test_client: $(COMM_OBJ) $(NET_OBJ) $(TCP_OBJ)
+$(PATH_BIN)/test_client: $(COMM_OBJ) $(NET_OBJ) $(TCP_OBJ)  $(CODER_OBJ)
 	$(CXX) $(CXXFLAGS) $(PATH_TESTCASES)/test_client.cpp -o $@  -ldl -pthread ./obj/*.o $(LIBS)
 #$(PATH_BIN)/test_client: $(LIB_OUT)
 #	$(CXX) $(CXXFLAGS) $(PATH_TESTCASES)/test_client.cc -o $@ $(LIB_OUT) $(LIBS) -ldl -pthread
@@ -95,8 +95,8 @@ $(PATH_OBJ)/%.o : $(PATH_NET)/%.cpp
 $(PATH_OBJ)/%.o : $(PATH_TCP)/%.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-#$(PATH_OBJ)/%.o : $(PATH_CODER)/%.cc
-#	$(CXX) $(CXXFLAGS) -c $< -o $@
+$(PATH_OBJ)/%.o : $(PATH_CODER)/%.cpp
+	$(CXX) $(CXXFLAGS) -c $< -o $@
 #
 #$(PATH_OBJ)/%.o : $(PATH_RPC)/%.cc
 #	$(CXX) $(CXXFLAGS) -c $< -o $@

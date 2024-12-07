@@ -1,3 +1,5 @@
+#include <cstring>
+#include <netinet/in.h>
 #include <sys/types.h>
 #include <sys/syscall.h>
 #include <sys/time.h>
@@ -32,6 +34,13 @@ int64_t getNowMs() {
 
   auto ret = val.tv_sec * 1000 + val.tv_usec / 1000;
   return ret;
+}
+
+int32_t getIntFromNetByte(const char *buf) {
+    int32_t ret;
+    memcpy(&ret, buf, sizeof(ret));
+
+    return ntohl(ret);
 }
 
 } // namespace rocket

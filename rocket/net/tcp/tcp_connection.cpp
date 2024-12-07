@@ -1,12 +1,14 @@
 #include "tcp_connection.h"
-#include "abstract_protocol.h"
+#include "codec/abstract_protocol.h"
+#include "codec/tinypb_codec.h"
+#include "codec/tinypb_protocol.h"
 #include "eventloop.h"
 #include "fd_event.h"
-#include "string_codec.h"
 #include "tcpbuffer.h"
 #include "fd_event_group.h"
 #include "log.h"
 #include <cerrno>
+#include <cstddef>
 #include <memory>
 #include <sys/socket.h>
 #include <utility>
@@ -25,7 +27,7 @@ TcpConnection::TcpConnection(EventLoop* eventloop, int fd, int buffer_size, NetA
 
     m_fd_event =  FdEventGroup::GetFdEventGroup()->getFdEvent(fd);
     m_fd_event->setNonBlock();
-    m_codec = new StringCodec();
+    m_codec = new TinyPBCodec();
 
     if (m_connection_type == TcpConnectionByServer) {
         listenRead();
@@ -101,18 +103,22 @@ void TcpConnection::excute() {
 
     if (m_connection_type == TcpConnectionByServer) {
         DEBUGLOG("in server read excute");
-        std::vector<char> tmp;
-        int size = m_in_buffer->readAble();
-        tmp.resize(size);
-        m_in_buffer->readToBuffer(tmp, size);
-        string str{tmp.begin(), tmp.end()};
-        str += '\0';
 
-        INFOLOG("succ get request[%s] from client[%s]",str.c_str(), m_peer_addr->toString().c_str());
+        std::vector<AbstractProtocol::s_ptr> rep_msgs;
+        std::vector<AbstractProtocol::s_ptr> result;
+        m_codec->decode(result, m_in_buffer);
+        DEBUGLOG("server decode end");
+        for (size_t i= 0; i < result.size(); i++) {
+            INFOLOG("succ get request[%s] from client[%s]",result[i]->m_req_id.c_str(), m_peer_addr->toString().c_str());
+            std::shared_ptr<TinyPBProtocol> msg = std::make_shared<TinyPBProtocol>();
+            msg->m_pb_data = "this is server response";
+            msg->m_req_id = result[i]->m_req_id;
+            rep_msgs.emplace_back(msg);
+        }
 
-        string str2("fuck");
+
+        m_codec->encode(rep_msgs, m_out_buffer);
         //m_out_buffer->writeToBuffer(tmp.data(), tmp.size());
-        m_out_buffer->writeToBuffer(str2.c_str(), str2.length());
         listenWrite();
     } else {
         DEBUGLOG("in client read excute");
@@ -140,8 +146,8 @@ void TcpConnection::write() {
         vector<AbstractProtocol::s_ptr> msgs;
         for (auto& v : m_write_done_callback) {
             msgs.push_back(v.first);
-            auto ptr = dynamic_cast<StringProtocol*>(v.first.get());
-            DEBUGLOG("pushed:%s", ptr->info.c_str());
+            //auto ptr = dynamic_cast<StringProtocol*>(v.first.get());
+            //DEBUGLOG("pushed:%s", ptr->info.c_str());
         }
         m_codec->encode(msgs, m_out_buffer);
         DEBUGLOG("codec wirte msg");

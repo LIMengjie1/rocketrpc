@@ -24,7 +24,7 @@ static thread_local int g_no = 0;
     } \
     m_listen_fds.insert(event->getFd()); \
     g_no = tmp.events; \
-    DEBUGLOG("add event succ %d, value:%u", event->getFd(), g_no); \
+    DEBUGLOG("add event succ fd:%d, value:%u", event->getFd(), g_no); \
 
 #define DEL_TO_EPOLL() \
     auto it = m_listen_fds.find(event->getFd()); \
@@ -39,7 +39,7 @@ static thread_local int g_no = 0;
     } \
     m_listen_fds.erase(event->getFd()); \
     g_no =tmp.events; \
-    DEBUGLOG("del event succ %d, value:%u", event->getFd(), g_no); \
+    DEBUGLOG("del event succ fd:%d, value:%u", event->getFd(), g_no); \
 
 
 namespace rocket {
