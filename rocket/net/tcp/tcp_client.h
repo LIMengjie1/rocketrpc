@@ -17,7 +17,7 @@ public:
 
     void writeMessage(AbstractProtocol::s_ptr message, std::function<void(AbstractProtocol::s_ptr)> done);
 
-    void readMessage(AbstractProtocol::s_ptr message, std::function<void(AbstractProtocol::s_ptr)> done);
+    void readMessage(const string& req_id, std::function<void(AbstractProtocol::s_ptr)> done);
 
 private:
     NetAddr::s_ptr m_peer_addr;

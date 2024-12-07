@@ -1,3 +1,4 @@
+#include "abstract_protocol.h"
 #include "net_addr.h"
 #include "rocket/common/log.h"
 #include "rocket/common/config.h"
@@ -8,6 +9,8 @@
 #include "rocket/net/io_thread_group.h"
 #include "rocket/net/tcp/tcp_server.h"
 #include "tcp_client.h"
+#include "string_codec.h"
+#include <functional>
 #include <iostream>
 #include <memory>
 #include <sys/socket.h>
@@ -54,7 +57,19 @@ void test_tcp_client() {
   rocket::TcpClient client(addr);
 
   client.connect([&](){
-    DEBUGLOG("connect ot %s succ", addr->toString().c_str());
+    DEBUGLOG("connect to %s succ", addr->toString().c_str());
+    std::shared_ptr<rocket::StringProtocol> msg = make_shared<rocket::StringProtocol>();
+    msg->info = "test rocket";
+    msg->setReqId("123");
+    DEBUGLOG("ERROR: client writeMessage");
+    client.writeMessage(msg, [](rocket::AbstractProtocol::s_ptr done) {
+      DEBUGLOG("send msg succ");
+    });
+    DEBUGLOG("ERROR: client readMessage");
+    client.readMessage("123", [](rocket::AbstractProtocol::s_ptr done) {
+     std::shared_ptr<rocket::StringProtocol> msg = std::dynamic_pointer_cast<rocket::StringProtocol>(done);
+     DEBUGLOG("get response:%s, info:%s", msg->getReqId().c_str(), msg->info.c_str());
+    });
   });
 }
 

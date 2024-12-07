@@ -10,6 +10,7 @@
 #include "util.h"
 #include "wakeup_fd_event.h"
 
+static thread_local int g_no = 0;
 #define  ADD_TO_EPOLL() \
     auto it = m_listen_fds.find(event->getFd()); \
     int op = EPOLL_CTL_ADD; \
@@ -22,7 +23,8 @@
         ERRORLOG("failed epoll_ctl when add fd, errno=%d, error=%s", errno, strerror(errno)); \
     } \
     m_listen_fds.insert(event->getFd()); \
-    DEBUGLOG("add event succ"); \
+    g_no = tmp.events; \
+    DEBUGLOG("add event succ %d, value:%u", event->getFd(), g_no); \
 
 #define DEL_TO_EPOLL() \
     auto it = m_listen_fds.find(event->getFd()); \
@@ -36,7 +38,8 @@
         ERRORLOG("failed to del epoll event"); \
     } \
     m_listen_fds.erase(event->getFd()); \
-    DEBUGLOG("del event succ %d", event->getFd()); \
+    g_no =tmp.events; \
+    DEBUGLOG("del event succ %d, value:%u", event->getFd(), g_no); \
 
 
 namespace rocket {
@@ -119,11 +122,12 @@ void EventLoop::loop() {
         if (rt < 0) {
             ERRORLOG("epoll wait error, error=%d", errno);
         } else {
-            DEBUGLOG("get event,%d.",rt);
+            DEBUGLOG("get %d event.",rt);
             for (int i = 0; i < rt; i++) {
                 epoll_event trigger_event = result_events[i];
                 FdEvent* fd_event = static_cast<FdEvent*>(trigger_event.data.ptr);
                 if (!fd_event) {
+                    DEBUGLOG("fd event null");
                     continue;
                 }
                 if (trigger_event.events & EPOLLIN) {
@@ -134,6 +138,11 @@ void EventLoop::loop() {
                     DEBUGLOG("get epollout event");
                     addTask(fd_event->handler(FdEvent::OUT_EVENT));
                 }
+                if (trigger_event.events & EPOLLERR) {
+                    DEBUGLOG("get error events");
+                }
+                uint32_t a = trigger_event.events;
+                DEBUGLOG("event vals:%u, fd:%d", a, fd_event->getFd());
             }
         }
     }

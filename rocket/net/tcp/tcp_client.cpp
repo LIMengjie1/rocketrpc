@@ -24,7 +24,7 @@ TcpClient::TcpClient(NetAddr::s_ptr peer_addr) {
     m_fd_event = FdEventGroup::GetFdEventGroup()->getFdEvent(m_fd);
     m_fd_event->setNonBlock();
 
-    m_connection = std::make_shared<TcpConnection>(m_event_loop, m_fd, 128, peer_addr);
+    m_connection = std::make_shared<TcpConnection>(m_event_loop, m_fd, 128, peer_addr, TcpConnection::TcpConnectionByClient);
     m_connection->setConnectionType(TcpConnection::TcpConnectionByClient);
 }
 
@@ -48,14 +48,19 @@ void TcpClient::connect(std::function<void()> done) {
                 int error = 0;
                 socklen_t err_len = sizeof(error);
                 getsockopt(m_fd, SOL_SOCKET, SO_ERROR, &error, &err_len);
+                bool is_connect_succ =false;
                 if (error == 0) {
                     DEBUGLOG("connect to %s succ", m_peer_addr->toString().c_str());
-                    if (done) done();
+                    is_connect_succ = true;
+                    m_connection->setState(TcpConnection::Connected);
                 } else {
                     DEBUGLOG("connect to %s failed", m_peer_addr->toString().c_str());
                 }
                 m_fd_event->cancle(FdEvent::OUT_EVENT);
-                m_event_loop->addEpollEvent(m_fd_event);
+                m_event_loop->delEpollEvent(m_fd_event);
+                if (is_connect_succ && done) {
+                    done();
+                } 
             });
             m_event_loop->addEpollEvent(m_fd_event);
             if (!m_event_loop->isLooping()) {
@@ -70,10 +75,12 @@ void TcpClient::connect(std::function<void()> done) {
 }
 
 void TcpClient::writeMessage(AbstractProtocol::s_ptr message, std::function<void(AbstractProtocol::s_ptr)> done) {
-
+   m_connection->pushSendMsg(message, done);
+   m_connection->listenWrite();
 }
 
-void TcpClient::readMessage(AbstractProtocol::s_ptr message, std::function<void(AbstractProtocol::s_ptr)> done) {
-
+void TcpClient::readMessage(const string& req_id, std::function<void(AbstractProtocol::s_ptr)> done) {
+    m_connection->pushReadMsg(req_id, done);
+    m_connection->listenRead();
 }
 }
