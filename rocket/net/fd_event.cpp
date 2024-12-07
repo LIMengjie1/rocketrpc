@@ -1,6 +1,7 @@
 #include "fd_event.h"
 #include "log.h"
 #include <functional>
+#include <sys/epoll.h>
 
 namespace rocket {
 FdEvent::FdEvent(int fd) : m_fd(fd) {
@@ -32,4 +33,11 @@ void FdEvent::listen(TriggerEvent event_type, std::function<void()> callback) {
     }
 }
 
+void FdEvent::cancle(TriggerEvent e) {
+    if (e == TriggerEvent::IN_EVENT) {
+        m_listen_events.events &= (~EPOLLIN);
+    } else  {
+        m_listen_events.events &= (~EPOLLOUT);
+    }
+}
 }

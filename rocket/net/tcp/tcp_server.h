@@ -5,6 +5,8 @@
 #include "net_addr.h"
 #include "eventloop.h"
 #include "io_thread_group.h"
+#include "tcp_connection.h"
+#include <set>
 
 namespace rocket {
 class TcpServer {
@@ -26,6 +28,7 @@ private:
     IOThreadGroup* m_io_thread_group = nullptr;
     FdEvent* m_listen_fd_event;
     int m_client_counts = 0;
+    std::set<TcpConnection::s_ptr> m_client;
 };
 
 }

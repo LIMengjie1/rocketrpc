@@ -20,6 +20,9 @@ public:
     bool isInLoopThread();
     void addTask(std::function<void()>, bool is_wake_up = false);
     void addTimerEvent(TimerEvent::s_ptr);
+    bool isLooping() {
+        return m_is_looping;
+    }
     static EventLoop* GetCurrentEventLoop();
 private:
     void dealWakeUp();
@@ -47,6 +50,8 @@ private:
     mutex m_mut;
 
     Timer* m_timer = nullptr;
+
+    bool m_is_looping = false;
 };
 
 }

@@ -26,6 +26,7 @@ void TcpBuffer::writeToBuffer(const char* buf, int size) {
         resizeBuffer(new_size);
     }
     memcpy(&m_buffer[m_write_index], buf, size);
+    m_write_index += size;
 }
 
 void TcpBuffer::resizeBuffer(int new_size) {
@@ -53,7 +54,7 @@ void TcpBuffer::readToBuffer(vector<char>& read, int size) {
 }
 
 void TcpBuffer::adjustBuffer() {
-    if (m_read_index > m_buffer.size() / 3) return;;
+    if (m_read_index < m_buffer.size() / 3) return;;
 
     vector<char> buffer(m_buffer.size());
 

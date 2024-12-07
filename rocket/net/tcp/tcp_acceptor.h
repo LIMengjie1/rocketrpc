@@ -15,7 +15,7 @@ public:
 
     int getListenFd();
 
-    int accept() {
+    std::pair<int, NetAddr::s_ptr>accept() {
         if (m_family == AF_INET) {
             sockaddr_in client_addr;
             memset(&client_addr, 0, sizeof(client_addr));
@@ -25,11 +25,11 @@ public:
             if (rt < 0) {
                 ERRORLOG("accept new client failed, erno:%d, error:%s", errno, strerror(errno));
             }
-            IPNetAddr peer_addr(client_addr);
-            INFOLOG("a client have accepted succ, peer addr [%s]", peer_addr.toString().c_str());
-            return rt;
+            IPNetAddr::s_ptr peer_addr = std::make_shared<IPNetAddr>(client_addr);
+            INFOLOG("a client have accepted succ, peer addr [%s]", peer_addr->toString().c_str());
+            return {rt, peer_addr};
         }
-        return -1;
+        return {-1, nullptr};
     }
 
 private:

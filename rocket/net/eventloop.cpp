@@ -14,18 +14,19 @@
     auto it = m_listen_fds.find(event->getFd()); \
     int op = EPOLL_CTL_ADD; \
     if (it != m_listen_fds.end()) { \
-        op = EPOLL_CTL_ADD; \
+        op = EPOLL_CTL_MOD; \
     } \
     epoll_event tmp = event->getEpollEvent(); \
     int rt = epoll_ctl(m_epoll_fd, op, event->getFd(), &tmp); \
     if (rt == -1) { \
-        ERRORLOG("failed to add epoll event"); \
+        ERRORLOG("failed epoll_ctl when add fd, errno=%d, error=%s", errno, strerror(errno)); \
     } \
+    m_listen_fds.insert(event->getFd()); \
     DEBUGLOG("add event succ"); \
 
 #define DEL_TO_EPOLL() \
     auto it = m_listen_fds.find(event->getFd()); \
-    int op = EPOLL_CTL_ADD; \
+    int op = EPOLL_CTL_DEL; \
     if (it == m_listen_fds.end()) { \
         return; \
     } \
@@ -34,7 +35,8 @@
     if (rt == -1) { \
         ERRORLOG("failed to del epoll event"); \
     } \
-    DEBUGLOG("del event succ"); \
+    m_listen_fds.erase(event->getFd()); \
+    DEBUGLOG("del event succ %d", event->getFd()); \
 
 
 namespace rocket {
@@ -97,6 +99,7 @@ EventLoop::~EventLoop() {
 }
 
 void EventLoop::loop() {
+    m_is_looping = true;
     while (!m_stop_flag) {
         queue<function<void()>> tmp;
         {

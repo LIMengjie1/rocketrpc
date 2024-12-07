@@ -1,6 +1,7 @@
 #pragma once
 
 #include "god.h"
+#include "log.h"
 #include <functional>
 #include <sys/epoll.h>
 #include <fcntl.h>
@@ -23,6 +24,8 @@ public:
 
     void listen(TriggerEvent, std::function<void()>);
 
+    void cancle(TriggerEvent);
+
     int getFd() const {
         return m_fd;
     }
@@ -32,6 +35,7 @@ public:
     }
 
     void setNonBlock() {
+       DEBUGLOG("fd;%d", m_fd);
        int flag = fcntl(m_fd, F_GETFL, 0); 
        if(flag & O_NONBLOCK) {
         return;

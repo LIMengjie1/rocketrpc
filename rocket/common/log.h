@@ -35,21 +35,21 @@ string formatString(const char* str, Args&&... args) {
 #define DEBUGLOG(str, ...)\
    if (rocket::Logger::GetGlobalLogger()->getLogLevel() <= rocket::Debug) \
    { \
-   rocket::Logger::GetGlobalLogger()->pushLog((new rocket::LogEvent(rocket::LogLevel::Debug))->toString() +"[" + string(__FILE__) + ":" +  to_string(__LINE__) + "]\t" + rocket::formatString(str, ##__VA_ARGS__) + "\n"); \
+   rocket::Logger::GetGlobalLogger()->pushLog((rocket::LogEvent(rocket::LogLevel::Debug)).toString() +"[" + string(__FILE__) + ":" +  to_string(__LINE__) + "]\t" + rocket::formatString(str, ##__VA_ARGS__) + "\n"); \
    rocket::Logger::GetGlobalLogger()->log(); \
    } \
 
 #define INFOLOG(str, ...)\
    if (rocket::Logger::GetGlobalLogger()->getLogLevel() <= rocket::Info) \
    { \
-   rocket::Logger::GetGlobalLogger()->pushLog((new rocket::LogEvent(rocket::LogLevel::Info))->toString() + "[" + string(__FILE__) + ":" +  to_string(__LINE__) + "]\t" + rocket::formatString(str, ##__VA_ARGS__) + "\n"); \
+   rocket::Logger::GetGlobalLogger()->pushLog((rocket::LogEvent(rocket::LogLevel::Info)).toString() + "[" + string(__FILE__) + ":" +  to_string(__LINE__) + "]\t" + rocket::formatString(str, ##__VA_ARGS__) + "\n"); \
    rocket::Logger::GetGlobalLogger()->log(); \
    }\
 
 #define ERRORLOG(str, ...)\
    if (rocket::Logger::GetGlobalLogger()->getLogLevel() <= rocket::Error) \
    { \
-   rocket::Logger::GetGlobalLogger()->pushLog((new rocket::LogEvent(rocket::LogLevel::Error))->toString() +"[" + string(__FILE__) + ":" +  to_string(__LINE__) + "]\t" + rocket::formatString(str, ##__VA_ARGS__) + "\n"); \
+   rocket::Logger::GetGlobalLogger()->pushLog((rocket::LogEvent(rocket::LogLevel::Error)).toString() +"[" + string(__FILE__) + ":" +  to_string(__LINE__) + "]\t" + rocket::formatString(str, ##__VA_ARGS__) + "\n"); \
    rocket::Logger::GetGlobalLogger()->log(); \
    }\
 

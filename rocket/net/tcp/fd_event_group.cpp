@@ -11,10 +11,10 @@ FdEventGroup* FdEventGroup::GetFdEventGroup() {
    if (g_fd_event_group) return g_fd_event_group; 
 
    g_fd_event_group = new FdEventGroup(128);
+   return g_fd_event_group;
 }
 
 FdEventGroup::FdEventGroup(int size) {
-    m_fd_group.resize(size);
     for (int i = 0; i < size; i++) {
         m_fd_group.emplace_back(new FdEvent(i));
     }
