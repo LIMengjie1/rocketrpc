@@ -4,6 +4,7 @@
 #include "codec/tinypb_protocol.h"
 #include "eventloop.h"
 #include "fd_event.h"
+#include "rpc_dispatcher.h"
 #include "tcpbuffer.h"
 #include "fd_event_group.h"
 #include "log.h"
@@ -16,8 +17,9 @@
 
 namespace rocket {
 
-TcpConnection::TcpConnection(EventLoop* eventloop, int fd, int buffer_size, NetAddr::s_ptr peer_addr, TcpConnectionType type) {
+TcpConnection::TcpConnection(EventLoop* eventloop, int fd, int buffer_size, NetAddr::s_ptr peer_addr, NetAddr::s_ptr local_addr, TcpConnectionType type) {
     m_peer_addr = peer_addr;
+    m_local_addr= local_addr;
     m_state = NotConnected;
     m_eventloop = eventloop;
     m_connection_type = type;
@@ -111,8 +113,9 @@ void TcpConnection::excute() {
         for (size_t i= 0; i < result.size(); i++) {
             INFOLOG("succ get request[%s] from client[%s]",result[i]->m_req_id.c_str(), m_peer_addr->toString().c_str());
             std::shared_ptr<TinyPBProtocol> msg = std::make_shared<TinyPBProtocol>();
-            msg->m_pb_data = "this is server response";
-            msg->m_req_id = result[i]->m_req_id;
+            //msg->m_pb_data = "this is server response";
+            //msg->m_req_id = result[i]->m_req_id;
+            RpcDispatcher::GetRpcDispatcher()->dispatch(result[i], msg, this);
             rep_msgs.emplace_back(msg);
         }
 
@@ -125,11 +128,14 @@ void TcpConnection::excute() {
         std::vector<AbstractProtocol::s_ptr> result;
         m_codec->decode(result, m_in_buffer);
 
+        DEBUGLOG("tcp client get result, size:%d", result.size());
         for (size_t i = 0; i < result.size(); i++) {
             string req_id = result[i]->getReqId();
+            DEBUGLOG("get req id:%s", req_id.c_str());
 
             auto it = m_read_done_callback.find(req_id);
             if (it != m_read_done_callback.end()) {
+                DEBUGLOG("in excute callback");
                 it->second(result[i]);
             }
         }

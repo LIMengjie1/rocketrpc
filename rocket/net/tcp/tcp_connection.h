@@ -4,6 +4,7 @@
 #include "fd_event.h"
 #include "god.h"
 #include "net_addr.h"
+#include "rpc_dispatcher.h"
 #include "tcpbuffer.h"
 #include "io_thread.h"
 #include "codec/abstract_codec.h"
@@ -27,7 +28,7 @@ public:
         TcpConnectionByClient = 2
     };
 
-    TcpConnection(EventLoop*, int fd, int buffer_size, NetAddr::s_ptr peer_addr, TcpConnectionType type = TcpConnectionByServer);
+    TcpConnection(EventLoop*, int fd, int buffer_size, NetAddr::s_ptr peer_addr, NetAddr::s_ptr local_addr, TcpConnectionType type = TcpConnectionByServer);
 
     ~TcpConnection();
 
@@ -56,6 +57,14 @@ public:
     void pushSendMsg(AbstractProtocol::s_ptr, std::function<void(AbstractProtocol::s_ptr)>);
 
     void pushReadMsg(const string& req_id, std::function<void(AbstractProtocol::s_ptr)>);
+
+    NetAddr::s_ptr getLocalAddr() {
+        return m_local_addr;
+    }
+
+    NetAddr::s_ptr getPeerAddr() {
+        return m_peer_addr;
+    }
 
 private:
     NetAddr::s_ptr m_local_addr;

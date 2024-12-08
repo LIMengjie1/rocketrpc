@@ -30,14 +30,14 @@ PATH_INSTALL_INC_CODER = $(PATH_INSTALL_INC_ROOT)/$(PATH_CODER)
 PATH_INSTALL_INC_RPC = $(PATH_INSTALL_INC_ROOT)/$(PATH_RPC)
 
 
-# PATH_PROTOBUF = /usr/include/google
-# PATH_TINYXML = /usr/include/tinyxml
+ PATH_PROTOBUF = /usr/local/include/google
+ PATH_TINYXML = /usr/include/tinyxml
 
 CXX := g++
 
 CXXFLAGS += -g -O0 -std=c++11 -Wall -Wno-deprecated -Wno-unused-but-set-variable
 
-CXXFLAGS += -I./ -I$(PATH_ROCKET)	-I$(PATH_COMM) -I$(PATH_NET) -I$(PATH_TCP) -I$(PATH_CODER) -I$(PATH_RPC)
+CXXFLAGS += -I./ -I$(PATH_ROCKET)	-I$(PATH_COMM) -I$(PATH_NET) -I$(PATH_TCP) -I$(PATH_CODER) -I$(PATH_RPC) -I$(PATH_PROTOBUF) -I$(PATH_TINYXML)
 
 LIBS += /usr/local/lib/libprotobuf.a /usr/local/lib/libtinyxml.a
 
@@ -50,7 +50,7 @@ RPC_OBJ := $(patsubst $(PATH_RPC)/%.cpp, $(PATH_OBJ)/%.o, $(wildcard $(PATH_RPC)
 
 #ALL_TESTS : $(PATH_BIN)/test_log $(PATH_BIN)/test_eventloop $(PATH_BIN)/test_tcp $(PATH_BIN)/test_client $(PATH_BIN)/test_rpc_client $(PATH_BIN)/test_rpc_server
 # ALL_TESTS : $(PATH_BIN)/test_log
-ALL_TESTS : $(PATH_BIN)/test_tcp  $(PATH_BIN)/test_client
+ALL_TESTS : $(PATH_BIN)/test_rpc_client $(PATH_BIN)/test_rpc_server
 
 #TEST_CASE_OUT := $(PATH_BIN)/test_log $(PATH_BIN)/test_eventloop $(PATH_BIN)/test_tcp $(PATH_BIN)/test_client  $(PATH_BIN)/test_rpc_client $(PATH_BIN)/test_rpc_server
 #TEST_CASE_OUT := $(PATH_BIN)/test_log $(PATH_BIN)/test_eventloop $(PATH_BIN)/test_tcp $(PATH_BIN)/test_client
@@ -62,25 +62,25 @@ ALL_TESTS : $(PATH_BIN)/test_tcp  $(PATH_BIN)/test_client
 #
 #$(PATH_BIN)/test_log: $(COMM_OBJ)
 #	$(CXX) $(CXXFLAGS) $(PATH_TESTCASES)/test_log.cpp -o $@  -ldl -pthread ./obj/*.o $(LIBS)
-$(PATH_BIN)/test_eventloop: $(COMM_OBJ) $(NET_OBJ) $(TCP_OBJ) $(CODER_OBJ)
-#	$(CXX) $(CXXFLAGS) $(PATH_TESTCASES)/test_eventloop.cpp -o $@ $(LIB_OUT) $(LIBS) -ldl -pthread
-	$(CXX) $(CXXFLAGS) $(PATH_TESTCASES)/test_eventloop.cpp -o $@  -ldl -pthread ./obj/*.o $(LIBS)
-
-$(PATH_BIN)/test_tcp: $(COMM_OBJ) $(NET_OBJ) $(TCP_OBJ) $(CODER_OBJ)
-#   $(CXX) $(CXXFLAGS) $(PATH_TESTCASES)/test_tcp.cpp -o $@ $(LIB_OUT) $(LIBS) -ldl -pthread
-	$(CXX) $(CXXFLAGS) $(PATH_TESTCASES)/test_tcp.cpp -o $@  -ldl -pthread ./obj/*.o $(LIBS)
-
-$(PATH_BIN)/test_client: $(COMM_OBJ) $(NET_OBJ) $(TCP_OBJ)  $(CODER_OBJ)
-	$(CXX) $(CXXFLAGS) $(PATH_TESTCASES)/test_client.cpp -o $@  -ldl -pthread ./obj/*.o $(LIBS)
+#$(PATH_BIN)/test_eventloop: $(COMM_OBJ) $(NET_OBJ) $(TCP_OBJ) $(CODER_OBJ) $(RPC_OBJ)
+##	$(CXX) $(CXXFLAGS) $(PATH_TESTCASES)/test_eventloop.cpp -o $@ $(LIB_OUT) $(LIBS) -ldl -pthread
+#	$(CXX) $(CXXFLAGS) $(PATH_TESTCASES)/test_eventloop.cpp -o $@  -ldl -pthread ./obj/*.o $(LIBS)
+#
+#$(PATH_BIN)/test_tcp: $(COMM_OBJ) $(NET_OBJ) $(TCP_OBJ) $(CODER_OBJ) $(RPC_OBJ) 
+##   $(CXX) $(CXXFLAGS) $(PATH_TESTCASES)/test_tcp.cpp -o $@ $(LIB_OUT) $(LIBS) -ldl -pthread
+#	$(CXX) $(CXXFLAGS) $(PATH_TESTCASES)/test_tcp.cpp -o $@  -ldl -pthread ./obj/*.o $(LIBS)
+#
+#$(PATH_BIN)/test_client: $(COMM_OBJ) $(NET_OBJ) $(TCP_OBJ)  $(CODER_OBJ) $(RPC_OBJ)
+#	$(CXX) $(CXXFLAGS) $(PATH_TESTCASES)/test_client.cpp -o $@  -ldl -pthread ./obj/*.o $(LIBS)
 #$(PATH_BIN)/test_client: $(LIB_OUT)
 #	$(CXX) $(CXXFLAGS) $(PATH_TESTCASES)/test_client.cc -o $@ $(LIB_OUT) $(LIBS) -ldl -pthread
 #
-#$(PATH_BIN)/test_rpc_client: $(LIB_OUT)
-#	$(CXX) $(CXXFLAGS) $(PATH_TESTCASES)/test_rpc_client.cc $(PATH_TESTCASES)/order.pb.cc -o $@ $(LIB_OUT) $(LIBS) -ldl -pthread
-#
-#$(PATH_BIN)/test_rpc_server: $(LIB_OUT)
-#	$(CXX) $(CXXFLAGS) $(PATH_TESTCASES)/test_rpc_server.cc $(PATH_TESTCASES)/order.pb.cc -o $@ $(LIB_OUT) $(LIBS) -ldl -pthread
-#
+$(PATH_BIN)/test_rpc_client: $(COMM_OBJ) $(NET_OBJ) $(TCP_OBJ)  $(CODER_OBJ) $(RPC_OBJ)
+	$(CXX) $(CXXFLAGS) $(PATH_TESTCASES)/test_rpc_client.cpp $(PATH_TESTCASES)/order.pb.cc -o $@ ./obj/*.o $(LIBS) -ldl -pthread 
+
+$(PATH_BIN)/test_rpc_server: $(COMM_OBJ) $(NET_OBJ) $(TCP_OBJ)  $(CODER_OBJ) $(RPC_OBJ)
+	$(CXX) $(CXXFLAGS) $(PATH_TESTCASES)/test_rpc_server.cpp $(PATH_TESTCASES)/order.pb.cc -o $@ ./obj/*.o $(LIBS) -ldl -pthread 
+
 
 #$(LIB_OUT): $(COMM_OBJ) $(NET_OBJ) $(TCP_OBJ) $(CODER_OBJ) $(RPC_OBJ)
 #	cd $(PATH_OBJ) && ar rcv librocket.a *.o && cp librocket.a ../lib/
@@ -98,8 +98,8 @@ $(PATH_OBJ)/%.o : $(PATH_TCP)/%.cpp
 $(PATH_OBJ)/%.o : $(PATH_CODER)/%.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 #
-#$(PATH_OBJ)/%.o : $(PATH_RPC)/%.cc
-#	$(CXX) $(CXXFLAGS) -c $< -o $@
+$(PATH_OBJ)/%.o : $(PATH_RPC)/%.cpp
+	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 # print something test
 # like this: make PRINT-PATH_BIN, and then will print variable PATH_BIN

@@ -16,6 +16,8 @@
 #include <memory>
 #include <sys/socket.h>
 
+#include "order.pb.h"
+
 void test_connect() {
   int fd = socket(AF_INET, SOCK_STREAM, 0);
 
@@ -61,15 +63,31 @@ void test_tcp_client() {
     DEBUGLOG("connect to %s succ", addr->toString().c_str());
     std::shared_ptr<rocket::TinyPBProtocol> msg = make_shared<rocket::TinyPBProtocol>();
     msg->setReqId("12345");
-    msg->m_pb_data = "test pb data";
+    
+    makeOrderRequest request;
+    request.set_price(100);
+    request.set_goods("apple");
+
+    if (!request.SerializeToString(&(msg->m_pb_data))) {
+        ERRORLOG("seilize error");
+        return;
+    }
+    msg->m_method_name = "Order.makeOrder";
+
     DEBUGLOG("ERROR: client writeMessage");
-    client.writeMessage(msg, [](rocket::AbstractProtocol::s_ptr done) {
-      DEBUGLOG("send msg succ");
+    client.writeMessage(msg, [request](rocket::AbstractProtocol::s_ptr done) {
+      DEBUGLOG("send msg succ request[%s]", request.ShortDebugString().c_str());
     });
     DEBUGLOG("ERROR: client readMessage");
     client.readMessage("12345", [](rocket::AbstractProtocol::s_ptr done) {
      std::shared_ptr<rocket::TinyPBProtocol> msg = std::dynamic_pointer_cast<rocket::TinyPBProtocol>(done);
      DEBUGLOG("get response:%s, info:%s", msg->getReqId().c_str(), msg->m_pb_data.c_str());
+     makeOrderResponse response;
+     if (!response.ParseFromString(msg->m_pb_data)) {
+        ERRORLOG("deserialize error");
+        return;
+     }
+     DEBUGLOG("get reponse succ, reponse:%s", response.ShortDebugString().c_str());
     });
   });
 }

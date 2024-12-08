@@ -49,7 +49,7 @@ void TcpServer::onAccept() {
     //TODO client fd 添加到任意IOthread
     //m_io_thread_group->getIOThread()->getEventLoop()->addEpollEvent(FdEvent *event);
     IOThread* io_thread = m_io_thread_group->getIOThread();
-    TcpConnection::s_ptr  connection = make_shared<TcpConnection>(io_thread->getEventLoop(), client_fd, 128, peer_addr);
+    TcpConnection::s_ptr  connection = make_shared<TcpConnection>(io_thread->getEventLoop(), client_fd, 128, peer_addr, m_local_addr);
     connection->setState(TcpConnection::Connected);
     m_client.insert(connection);
     INFOLOG("tcp server succ get client fd:%d", client_fd);

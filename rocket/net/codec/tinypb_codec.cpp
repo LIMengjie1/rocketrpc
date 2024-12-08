@@ -11,6 +11,7 @@
 namespace rocket {
 void TinyPBCodec::encode(std::vector<AbstractProtocol::s_ptr> &msgs, TcpBuffer::s_ptr out_buffer) {
     for (auto & v : msgs) {
+        DEBUGLOG("encode msg req id:%s, req id:%s", v->getReqId().c_str(), v->m_req_id.c_str());
         std::shared_ptr<TinyPBProtocol> msg = std::dynamic_pointer_cast<TinyPBProtocol>(v);
         int len = 0;
         const char* buf = encodeTinyPB(msg, len);
@@ -72,6 +73,7 @@ void TinyPBCodec::decode(std::vector<AbstractProtocol::s_ptr> &out_msgs, TcpBuff
 
         int req_id_index = req_id_len_index + sizeof(msg->m_req_id_len);
         
+        DEBUGLOG("req id len index:%d, req id index:%d", req_id_len_index, req_id_index);
         char req_id[100] = {0};
         std::memcpy(&req_id[0], &tmp[req_id_index], msg->m_req_id_len);
         msg->m_req_id = string(req_id);
@@ -151,7 +153,7 @@ const char* TinyPBCodec::encodeTinyPB(std::shared_ptr<TinyPBProtocol> msg, int &
     tmp += sizeof(req_id_len_net);
 
     if (!msg->m_req_id.empty()) {
-        memcpy(tmp, &(msg->m_req_id), req_id_len);
+        memcpy(tmp, (msg->m_req_id.c_str()), req_id_len);
         tmp += req_id_len;
     }
 

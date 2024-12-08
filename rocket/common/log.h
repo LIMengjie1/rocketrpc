@@ -9,6 +9,7 @@ using std::cout;
 using std::endl;
 
 using std::string;
+using std::to_string;
 using std::queue;
 
 namespace rocket {

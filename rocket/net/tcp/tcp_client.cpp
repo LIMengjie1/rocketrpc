@@ -24,7 +24,7 @@ TcpClient::TcpClient(NetAddr::s_ptr peer_addr) {
     m_fd_event = FdEventGroup::GetFdEventGroup()->getFdEvent(m_fd);
     m_fd_event->setNonBlock();
 
-    m_connection = std::make_shared<TcpConnection>(m_event_loop, m_fd, 128, peer_addr, TcpConnection::TcpConnectionByClient);
+    m_connection = std::make_shared<TcpConnection>(m_event_loop, m_fd, 128, peer_addr,nullptr, TcpConnection::TcpConnectionByClient);
     m_connection->setConnectionType(TcpConnection::TcpConnectionByClient);
 }
 
